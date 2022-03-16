@@ -4,54 +4,73 @@
    xmlns:f="sap.f"
    xmlns:card="sap.f.cards"
    xmlns:mvc="sap.ui.core.mvc">
-   <VBox>
-        <f:Card class="sapUiMediumMargin" width="300px" height="600px">
-            <f:header>
-                <card:Header
-                    title="Please select the scenario"
-                />
-            </f:header>
-            <f:content>
-
-                <ScrollContainer
-                    height="100%"
-                    width="100%"
-                    vertical="true"
-                    focusable="true">
-                    <VBox
-                        class="sapUiSmallMargin"
-                        justifyContent="SpaceBetween"
-                    >
-                        <RadioButtonGroup id="GroupA">
-                            <RadioButton text="Option 1" selected="true" />
-                            <RadioButton text="Option 2" />
-                            <RadioButton text="Option 3" />
-                            <RadioButton text="Option 4" />
-                            <RadioButton text="Option 5" />
-                                <RadioButton text="Option 2" />
-                            <RadioButton text="Option 3" />
-                            <RadioButton text="Option 4" />
-                            <RadioButton text="Option 5" />
-                                <RadioButton text="Option 2" />
-                            <RadioButton text="Option 3A" />
-                            <RadioButton text="Option 4" />
-                            <RadioButton text="Option 5" />
-                                <RadioButton text="Option 2" />
-                            <RadioButton text="Option 3" />
-                            <RadioButton text="Option 4" />
-                            <RadioButton text="Option 5" />
-                                <RadioButton text="Option 2" />
-                            <RadioButton text="Option 3" />
-                            <RadioButton text="Option 4" />
-                            <RadioButton text="Option 5" />
-                                <RadioButton text="Option 2" />
-                            <RadioButton text="Option 3" />
-                            <RadioButton text="Option 4" />
-                            <RadioButton text="Option 5" />
-                        </RadioButtonGroup>
-                    </VBox>
-                </ScrollContainer>
-		</f:content>
-    	</f:Card>
-   </VBox>
+   <HBox alignItems="Center" alignContent="Center">
+       <VBox width="30%" class="sapUiMediumMarginTopBottom">
+            <f:Card class="sapUiMediumMargin" width="100%" height="600px">
+                <f:header>
+                    <card:Header
+                        title="Please select the scenario"
+                    />
+                </f:header>
+                <f:content>
+                    <ScrollContainer
+                        height="100%"
+                        width="100%"
+                        vertical="true"
+                        focusable="true">
+                            <RadioButtonGroup 
+                                id="GroupA"
+                                buttons="{scenarioModel>/scenario}"
+                                >
+                                    <RadioButton text="{scenarioModel>label}" selected="{scenarioModel>selected}" select="onScenarioSelect" />
+                            </RadioButtonGroup>
+                    </ScrollContainer>
+                </f:content>
+            </f:Card>
+        </VBox>
+        <VBox id="checksBox" width="30%" class="sapUiMediumMargin sapUiLargeMarginBeginEnd" visible="false">
+            <f:Card id="checksCard" class="sapUiMediumMargin" width="100%" height="600px">
+                <f:header>
+                    <card:Header
+                        title="Please select the checks"
+                    />
+                </f:header>
+                <f:content>
+                    <ScrollContainer
+                        height="100%"
+                        width="100%"
+                        vertical="true"
+                        content="{scenarioModel>/checks}"
+                        focusable="true">
+                            <HBox>
+                                <CheckBox text="{scenarioModel>label}" selected="{scenarioModel>selected}" />
+                            </HBox>
+                    </ScrollContainer>
+            </f:content>
+            </f:Card>
+        </VBox>
+        <VBox id="vaildXmlBox" width="30%" class="sapUiMediumMarginTopBottom" visible="false">
+            <f:Card id="vaildXmlCard" class="sapUiMediumMargin" width="100%" height="600px">
+                <f:header>
+                    <card:Header
+                        title="Please select the scenarios"
+                    />
+                </f:header>
+                <f:content>
+                    <ScrollContainer
+                        height="100%"
+                        width="100%"
+                        vertical="true"
+                        focusable="true">
+                            <RadioButtonGroup 
+                                id="GroupC"
+                                buttons="{scenarioModel>/scenario}"
+                                >
+                                    <RadioButton text="{scenarioModel>label}" selected="" />
+                            </RadioButtonGroup>
+                    </ScrollContainer>
+            </f:content>
+            </f:Card>
+        </VBox>
+   </HBox>
 </mvc:View>
