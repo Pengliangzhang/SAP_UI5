@@ -22,7 +22,7 @@
                                 id="GroupA"
                                 buttons="{scenarioModel>/scenario}"
                                 >
-                                    <RadioButton text="{scenarioModel>label}" selected="{scenarioModel>selected}" select="onScenarioSelect" />
+                                    <RadioButton text="{scenarioModel>scenarioName}" selected="{scenarioModel>selected}" select="onScenarioSelect" />
                             </RadioButtonGroup>
                     </ScrollContainer>
                 </f:content>
@@ -40,10 +40,10 @@
                         height="100%"
                         width="100%"
                         vertical="true"
-                        content="{scenarioModel>/checks}"
+                        content="{vaildChecksModel>/checks}"
                         focusable="true">
                             <HBox>
-                                <CheckBox text="{scenarioModel>label}" selected="{scenarioModel>selected}" select="onCheckSelect" />
+                                <CheckBox text="{vaildChecksModel>label}" selected="{vaildChecksModel>selected}" select="onCheckSelect" />
                             </HBox>
                     </ScrollContainer>
             </f:content>
@@ -72,5 +72,19 @@
             </f:content>
             </f:Card>
         </VBox>
+   </HBox>
+   <HBox width="100%" justifyContent="Center">
+        <Button text="Download Zip"
+                type="Emphasized"
+                press="onDownloadClick"
+                class="sapUiResponsiveMargin"
+                ariaDescribedBy="defaultButtonDescription genericButtonDescription">
+        </Button>
+        <Button text="Create Analysis"
+                type="Accept"
+                press="onCreateClick"
+                class="sapUiResponsiveMargin"
+                ariaDescribedBy="defaultButtonDescription genericButtonDescription">
+        </Button>
    </HBox>
 </mvc:View>
