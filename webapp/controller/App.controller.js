@@ -1,8 +1,9 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
-    "sap/m/RadioButton"
-], function (Controller, JSONModel, RadioButton) {
+    "sap/m/RadioButton",
+    "sap/ui/demo/walkthrough/util/Util"
+], function (Controller, JSONModel, RadioButton, Util) {
     "use strict";
     return Controller.extend("sap.ui.demo.walkthrough.controller.App", {
 
@@ -10,28 +11,6 @@ sap.ui.define([
             const baseUrl = "http://localhost:3000";
             this.baseUrl = baseUrl;
             // set data model on view
-            const oData = {
-                checks: [
-                    {
-                        label: "ABAP",
-                        selected: false,
-                        vaildXmls: [ 
-                            {
-                                type: "Normal",
-                                checked: true
-                            },
-                            {
-                                type: "Error",
-                                checked: false
-                            },
-                            {
-                                type: "No Data",
-                                checked: false
-                            },
-                        ]
-                    }
-                ],
-            };
             this.initScenarioData();
         },
 
@@ -64,7 +43,7 @@ sap.ui.define([
                         checkList.push(check)
                     }
                 }
-                const oModel = new JSONModel({ checks: checkList });
+                const oModel = new JSONModel({ checks: checkList, currentCheck: null });
                 this.getView().setModel(oModel, "vaildChecksModel");
             }
         },
@@ -74,25 +53,64 @@ sap.ui.define([
             const scenario = this.byId("checksCard").getHeader().getTitle();
             const cardTitle = `${scenario} -> ${oSource.getText()}`;
             this.byId("vaildXmlCard").getHeader().setTitle(cardTitle);
+            const vaildChecks = this.getView().getModel("vaildChecksModel").oData;
+            let vaildXmlsModel = null;
             if (oEvent.getParameters().selected) {
-                const checks = this.getView().getModel("vaildChecksModel").oData.checks;
-                const vaildXmls = checks.find((item) => item.label === oSource.getText());
+                vaildChecks.currentCheck = oSource.getText()
+                const vaildXmls = vaildChecks.checks.find((item) => item.label === oSource.getText());
                 const vaildXmlsList = vaildXmls.vaildXmls.map((item) => {
-                    return {
-                        type: item.xmlType,
-                        checked: item.xmlType === "normal" ? true : false,
+                    if (item.checked === undefined) {
+                        item.checked = item.xmlType === "normal" ? true : false;
                     }
+                    return item;
                 });
-                const oModel = new JSONModel({ vaildXmls: vaildXmlsList});
-                this.getView().setModel(oModel, "vaildXmlsModel");
+                vaildXmlsModel = new JSONModel({ vaildXmls: vaildXmlsList});
             } else {
-                const oModel = new JSONModel({ vaildXmls: []});
-                this.getView().setModel(oModel, "vaildXmlsModel");
+                vaildChecks.currentCheck = null;
+                vaildXmlsModel = new JSONModel({ vaildXmls: []});                
+            }
+            const vaildChecksModel = new JSONModel(vaildChecks);
+            this.getView().setModel(vaildXmlsModel, "vaildXmlsModel");
+            this.getView().setModel(vaildChecksModel, "vaildChecksModel");
+
+            const enabledDownload = vaildChecks.checks.some((item) => item.selected === true)
+            if (enabledDownload) {
+                this.byId("downloadBtn").setEnabled();
+                this.byId("createBtn").setEnabled();
+            } else {
+                this.byId("downloadBtn").setEnabled(false);
+                this.byId("createBtn").setEnabled(false);
             }
         },
 
-        onDownloadClick: function () {
-            console.log("downloading !!!");
+        onDownloadClick: async function () {
+            const scenarioList = this.getView().getModel("scenarioModel").oData;
+            const checksList = this.getView().getModel("vaildChecksModel").oData;
+            const currScenario = scenarioList.scenario.find((item) => item.selected === true )
+            const selectedChecks = []
+            checksList.checks.forEach((item) => {
+                if (item.selected) {
+                    const check = {};
+                    check.checkName = item.label;
+                    item.vaildXmls.forEach(xml => {
+                        if (xml.checked) {
+                            check.type = xml.xmlType;
+                        }
+                    });
+                    selectedChecks.push(check);
+                }
+            });
+            const requestBody = {
+                fileDownloadInfo: {
+                    checkList: selectedChecks,
+                    scenarioName: currScenario.scenarioName
+                }
+            };
+            const zipFile = await this.queryZipFile(requestBody);
+            const a = document.createElement('a');
+            a.href = `${this.baseUrl}/file/zip/${zipFile.data}`;
+            a.click();
+            a.remove();
         },
 
         onCreateClick: function () {
@@ -116,13 +134,13 @@ sap.ui.define([
             })
         },
 
-        returnPostPromise: function (url) {
+        returnPostPromise: function (url, body) {
             return new Promise((resolve, reject) => {
                 $.ajax(`${this.baseUrl}${url}`, {
                     type: "POST",
-                    contentType: "application/json"
+                    data: body,
                 }).done((data, textStatus, jqXhr) => {
-                    resolve(data)
+                    resolve({data, textStatus, jqXhr})
                 }).fail((jqXhr, textStatus, errorThrown) => {
                     reject(errorThrown)
                 })
@@ -136,5 +154,9 @@ sap.ui.define([
         queryVaildChecks: async function (scenarioName) {
             return await this.returnGetPromise(`/file/vaildCheckByScenario/${scenarioName}`);
         },
+
+        queryZipFile: async function (requestBody) {
+            return await this.returnPostPromise("/file/", requestBody);
+        }
     });
 });
