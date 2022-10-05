@@ -8,7 +8,7 @@ sap.ui.define([
     return Controller.extend("sap.ui.demo.walkthrough.controller.App", {
 
         onInit: function () {
-            const baseUrl = "http://localhost:3000";
+            const baseUrl = "https://cloud-sample-node-chat-demo-app-i557938.c-20282ad.kyma.ondemand.com";
             this.baseUrl = baseUrl;
             // set data model on view
             this.initScenarioData();
@@ -28,7 +28,7 @@ sap.ui.define([
             const oSource = oEvent.getSource();
             if (oEvent.getParameters().selected) {
                 this.byId("checksBox").setVisible(true);
-                this.byId("vaildXmlBox").setVisible(true);
+                this.byId("vaildXmlBox").setVisible(false);
                 this.byId("checksCard").getHeader().setTitle(oSource.getText());
                 const allChecks = await this.queryVaildChecks(oSource.getText());
                 const checkList = []
@@ -57,6 +57,7 @@ sap.ui.define([
             let vaildXmlsModel = null;
             if (oEvent.getParameters().selected) {
                 vaildChecks.currentCheck = oSource.getText()
+                this.byId("vaildXmlBox").setVisible(true);
                 const vaildXmls = vaildChecks.checks.find((item) => item.label === oSource.getText());
                 const vaildXmlsList = vaildXmls.vaildXmls.map((item) => {
                     if (item.checked === undefined) {
@@ -76,7 +77,7 @@ sap.ui.define([
             const enabledDownload = vaildChecks.checks.some((item) => item.selected === true)
             if (enabledDownload) {
                 this.byId("downloadBtn").setEnabled();
-                this.byId("createBtn").setEnabled();
+                this.byId("createBtn").setEnabled(false);
             } else {
                 this.byId("downloadBtn").setEnabled(false);
                 this.byId("createBtn").setEnabled(false);

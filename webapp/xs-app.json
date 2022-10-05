@@ -1,0 +1,12 @@
+{
+  "welcomeFile": "index.html",
+  "routes": [
+    {
+      "source": "^/api/",
+      "target": "/",
+      "destination": "https://cloud-sample-node-chat-demo-app-i557938.c-20282ad.kyma.ondemand.com",
+      "authorizationType": "none",
+      "csrfProtection": false
+    }
+  ]
+}
